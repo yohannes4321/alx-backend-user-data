@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
-"""Authentication module.
-"""
+"""Authentication module"""
+import re
 from flask import request
-from typing import List, TypeVar
-import fnmatch
+from typing import List, TypeVar, Union
 
 
 class Auth:
-    """Authentication class.
-    """
-    def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """ Method to check if auth is required.
-        """
-        if path is None:
-            return True
-
-        if excluded_paths is None or not excluded_paths:
-            return True
-
-        for excluded_path in excluded_paths:
-            if fnmatch.fnmatch(path, excluded_path):
-                return False
-
+    """Authentication class"""
+    def require_auth(self, path: Union[str, None],
+                     excluded_paths: List[str]) -> bool:
+        """Determines if the path requires authentication"""
+        if path and excluded_paths:
+            for excluded in excluded_paths:
+                pattern = ''
+                if excluded[-1] == '*':
+                    pattern = f'{excluded[0:-1]}.*'
+                elif excluded[-1] == '/':
+                    pattern = f'{excluded[0:-1]}/*'
+                else:
+                    pattern = f'{excluded}/*'
+                if re.match(pattern, path):
+                    return False
         return True
 
     def authorization_header(self, request=None) -> str:
-        """ Method to get authorization header.
-        """
-        if request is not None:
-            return request.headers.get('Authorization', None)
+        """Returns None"""
+        if request is None:
+            return None
+        if request.headers.get('Authorization'):
+            return request.headers['Authorization']
         return None
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """ Method to get user from request.
-        """
+        """Returns None"""
         return None
