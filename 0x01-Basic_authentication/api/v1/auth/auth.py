@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import base64
 """Authentication module for API
 """
 
@@ -39,3 +40,6 @@ class Auth:
             return None
 
         return None  # User not authenticated
+
+
+        
